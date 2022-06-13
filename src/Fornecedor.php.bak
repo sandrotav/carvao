@@ -1,0 +1,54 @@
+<?php
+
+	class Fornecedor{
+		
+		private $mysql;
+		
+		public function __construct(mysqli $mysql){
+			$this->mysql = $mysql;
+		}
+				
+		public function exibirTodos(): array{
+			
+			$resultado = $this->mysql->query('SELECT idFornecedor, noFornecedor, endFornecedor, CidadeFornecedor, UfFornecedor, CepFornecedor, placaFornecedor, obsFornecedor FROM fornecedor');
+			$fornece = $resultado->fetch_all(MYSQLI_ASSOC);
+			//var_dump($fornece);
+			return $fornece;
+		}
+		
+	
+		public function incluir(string $noFornecedor, string $endFornecedor, string $CidadeFornecedor, string $CepFornecedor, string $UfFornecedor, string $placaFornecedor, string $obsFornecedor): void {
+			$incluirFornecedor = $this->mysql->prepare('insert into fornecedor (noFornecedor, endFornecedor, CidadeFornecedor, CepFornecedor, UfFornecedor, placaFornecedor, obsFornecedor) values(?,?,?,?,?,?,?);');
+			echo $noFornecedor, $endFornecedor, $CidadeFornecedor, $CepFornecedor, $UfFornecedor, $placaFornecedor, $obsFornecedor;
+			$incluirFornecedor->bind_param('sssssss', $noFornecedor, $endFornecedor, $CidadeFornecedor, $CepFornecedor, $UfFornecedor, $placaFornecedor, $obsFornecedor);
+			$incluirFornecedor->execute();
+		}
+		
+		public function alterar(string $idFornecedor, string $noFornecedor, string $CidadeFornecedor, string $CepFornecedor, string $UfFornecedor, string $placaFornecedor, string $obsFornecedor): void {
+	
+			$editaFornecedor = $this->mysql->prepare('update fornecedor set noFornecedor = ?, CidadeFornecedor = ?, CepFornecedor = ?, UfFornecedor = ?, placaFornecedor = ?, obsFornecedor = ? where idFornecedor=?;');
+   	  												//update fornecedor set noFornecedor = 'teste', CidadeFornecedor = 'Onça do Pitangui' , CepFornecedor = '35650001', UfFornecedor = 'MGX', placaFornecedor = 'UUU-9876', obsFornecedor = 'Observação do teste' where idFornecedor=2;
+			$editaFornecedor->bind_param('sssssss', $noFornecedor, $CidadeFornecedor, $CepFornecedor, $UfFornecedor, $placaFornecedor, $obsFornecedor, $idFornecedor);
+			$editaFornecedor->execute();
+		}
+				
+		public function remover(string $idFornecedor): void {
+			$removerFornecedor = $this->mysql->prepare('delete from fornecedor where idFornecedor=?');
+			$removerFornecedor->bind_param('s', $idFornecedor);
+			$removerFornecedor->execute();
+		}
+		
+		public function encontrarPorId(string $idFornecedor){
+			//echo 'FORNCEDOR ID';
+			//echo $_POST['idFornecedor'];
+			$selecionaFornecedor = $this->mysql->prepare('SELECT idFornecedor, noFornecedor, endFornecedor, CidadeFornecedor, UfFornecedor, CepFornecedor, placaFornecedor, obsFornecedor FROM fornecedor WHERE idFornecedor=?');
+			$selecionaFornecedor->bind_param('s',$idFornecedor);
+			$selecionaFornecedor->execute();
+			$FornecedorSelecionado = $selecionaFornecedor->get_result()->fetch_assoc();
+			return $FornecedorSelecionado;
+		}
+		
+		
+	}
+
+ ?>
